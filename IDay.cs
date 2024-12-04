@@ -10,18 +10,57 @@ public abstract class Day : IDay
         _dayNbr = dayNbr;
     }
 
+    public CharMatrix CharMatrix()
+    {
+        return new CharMatrix(Input);
+    }
+
     public abstract long RunPart1();
 
     public abstract long RunPart2();
 
     public string GetResult()
     {
-        return  $"""
+        return $"""
                 === Day {_dayNbr} ===
                 Part 1: {RunPart1()}
                 Part 2: {RunPart2()}
                 """;
     }
+}
+
+public abstract class Matrix<T> where T : struct
+{
+    private readonly string[] _input;
+
+    protected Matrix(string[] input)
+    {
+        XMax = input[0].Length;
+        YMax = input.Length;
+        _input = input;
+    }
+
+    public int XMax { get; set; }
+
+    public int YMax { get; set; }
+    public abstract T[][] M { get; }
+
+    protected T[][] Create(Func<char, T> parseFunc)
+    {
+        var result = new List<T[]>();
+        for (int i = 0; i < XMax; i++)
+        {
+            var yCol = _input.Select(row => parseFunc(row[i])).ToArray();
+
+            result.Add(yCol);
+        }
+        return [.. result];
+    }
+}
+
+public class CharMatrix(string[] input) : Matrix<char>(input)
+{
+    public override char[][] M => Create(c => c);
 }
 
 public interface IDay
