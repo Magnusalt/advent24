@@ -11,10 +11,14 @@ var days = new List<IDay>
     // new Day4(),
     //new Day5()
     //new Day6(),
-    new Day11()
+    //new Day11()
 };
+
 
 foreach (var day in days)
 {
     Console.WriteLine(day.GetResult());
 }
+var day17 = new Day17();
+
+Console.WriteLine(day17.RunPart2());

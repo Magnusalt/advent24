@@ -1,5 +1,5 @@
 
-public abstract class Day : IDay
+public abstract class Day<TP1, TP2> : IDay<TP1, TP2>
 {
     private readonly int _dayNbr;
 
@@ -15,9 +15,9 @@ public abstract class Day : IDay
         return new CharMatrix(Input);
     }
 
-    public abstract long RunPart1();
+    public abstract TP1 RunPart1();
 
-    public abstract long RunPart2();
+    public abstract TP2 RunPart2();
 
     public string GetResult()
     {
@@ -26,6 +26,13 @@ public abstract class Day : IDay
                 Part 1: {RunPart1()}
                 Part 2: {RunPart2()}
                 """;
+    }
+}
+
+public abstract class Day : Day<long, long>, IDay
+{
+    protected Day(int dayNbr) : base(dayNbr)
+    {
     }
 }
 
@@ -63,9 +70,11 @@ public class CharMatrix(string[] input) : Matrix<char>(input)
     public override char[][] M => Create(c => c);
 }
 
-public interface IDay
+public interface IDay<out TP1, out TP2>
 {
-    long RunPart1();
-    long RunPart2();
+    TP1 RunPart1();
+    TP2 RunPart2();
     string GetResult();
 }
+
+public interface IDay : IDay<long, long>{}
