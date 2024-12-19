@@ -62,6 +62,92 @@ public class Day6() : Day(6)
 
     public override long RunPart2()
     {
-        return 0;
+        var dir = new Vector2(0, -1);
+
+        var map = CharMatrix();
+
+        var xCurrent = 0;
+        var yCurrent = 0;
+
+        var cache = new HashSet<(int, int, Vector2)>();
+
+        for (int x = 0; x < map.XMax; x++)
+        {
+            for (int y = 0; y < map.YMax; y++)
+            {
+                if (map.M[x][y] == '^')
+                {
+                    xCurrent = x;
+                    yCurrent = y;
+                }
+            }
+        }
+
+        var nbrOfPossibleCirculars = 0;
+
+        while (xCurrent >= 0 && xCurrent < map.XMax && yCurrent >= 0 && yCurrent < map.YMax)
+        {
+            var path = map.M[xCurrent][yCurrent];
+            if (path is '.' or '^')
+            {
+
+
+                var isCircular = TurnHere(xCurrent, yCurrent, map, dir, cache);
+                if (isCircular)
+                {
+                    nbrOfPossibleCirculars++;
+                }
+
+
+                xCurrent += (int)dir.X;
+                yCurrent += (int)dir.Y;
+            }
+            else
+            {
+                xCurrent -= (int)dir.X;
+                yCurrent -= (int)dir.Y;
+                dir = RotateIntegral(dir);
+            }
+        }
+
+        return nbrOfPossibleCirculars;
+    }
+
+    private bool TurnHere(int xCurrent, int yCurrent, CharMatrix map, Vector2 dir, HashSet<(int, int, Vector2)> global)
+    {
+        dir = RotateIntegral(dir);
+        var cache = new HashSet<(int, int, Vector2)>();
+
+        var turns = 0;
+        while (xCurrent >= 0 && xCurrent < map.XMax && yCurrent >= 0 && yCurrent < map.YMax)
+        {
+            if (cache.Contains((xCurrent, yCurrent, dir)) || global.Contains((xCurrent, yCurrent, dir)))
+            {
+                foreach (var item in cache)
+                {
+                    global.Add(item);
+                }
+                return true;
+            }
+            cache.Add((xCurrent, yCurrent, dir));
+            var path = map.M[xCurrent][yCurrent];
+            if (path is '.' or '^')
+            {
+                xCurrent += (int)dir.X;
+                yCurrent += (int)dir.Y;
+            }
+            else
+            {
+                xCurrent -= (int)dir.X;
+                yCurrent -= (int)dir.Y;
+                dir = RotateIntegral(dir);
+                turns++;
+            }
+            if(turns > 100)
+            {
+                return false;
+            }
+        }
+        return false;
     }
 }
