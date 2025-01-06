@@ -1,13 +1,13 @@
 public class Day17() : Day<string, long>(17)
 {
     private readonly List<int> Program = [2, 4, 1, 5, 7, 5, 4, 3, 1, 6, 0, 3, 5, 5, 3, 0];
-    private int RegisterA = 61156655;
-    private int RegisterB = 0;
-    private int RegisterC = 0;
+    private long RegisterA = 1024;
+    private long RegisterB = 0;
+    private long RegisterC = 0;
 
     private int InstructionPointer = 0;
 
-    private List<int> Output = [];
+    private List<long> Output = [];
 
     public override string RunPart1()
     {
@@ -22,38 +22,47 @@ public class Day17() : Day<string, long>(17)
 
     public override long RunPart2()
     {
-        var result = string.Join(',', Program);
-        var regA = 0;
-        bool resFound = false;
-        while (!resFound && regA < int.MaxValue)
+
+        long[] output = new long[16];
+        long startA = (long)Math.Pow(8, 15);
+
+        var pow = 14;
+
+        while (!output.Zip(Program, (a, b) => a == b).All(c => c))
         {
-            Reset(regA);
-            while (InstructionPointer < Program.Count)
+            var a = startA;
+            output = new long[16];
+            var i = 0;
+            while (a > 0)
             {
-                Do();
+                var b = a % 8;
+                b ^= 5;
+                var c = a / (long)Math.Pow(2, b);
+                b ^= c;
+                b ^= 6;
+
+                a /= 8;
+                var o = b % 8;
+
+                output[i] = o;
+
+                i++;
             }
 
-            if (string.Join(',', Output) == result)
+            if (pow > 0 && output[pow..].Zip(Program[pow..], (a, b) => a == b).All(c => c))
             {
-                resFound = true;
+                while (output[pow] == Program[pow])
+                {
+                    pow--;
+                }
             }
-            else
-            {
-                regA += 8;
-            }
+
+            startA += (long)Math.Pow(8, pow);
         }
 
-        return regA;
+        return startA - 1;
     }
 
-    private void Reset(int regA)
-    {
-        InstructionPointer = 0;
-        RegisterA = regA;
-        RegisterB = 0;
-        RegisterC = 0;
-        Output.Clear();
-    }
 
     private void Do()
     {
@@ -95,7 +104,7 @@ public class Day17() : Day<string, long>(17)
         }
     }
 
-    private int GetComboValue(int comboOperand)
+    private long GetComboValue(int comboOperand)
     {
         return comboOperand switch
         {
@@ -107,7 +116,7 @@ public class Day17() : Day<string, long>(17)
         };
     }
 
-    private void ADV(int comboValue)
+    private void ADV(long comboValue)
     {
         RegisterA /= (int)Math.Pow(2, comboValue);
     }
@@ -117,7 +126,7 @@ public class Day17() : Day<string, long>(17)
         RegisterB ^= literalValue;
     }
 
-    private void BST(int comboValue)
+    private void BST(long comboValue)
     {
         RegisterB = comboValue % 8;
     }
@@ -137,17 +146,17 @@ public class Day17() : Day<string, long>(17)
         RegisterB ^= RegisterC;
     }
 
-    private void OUT(int comboValue)
+    private void OUT(long comboValue)
     {
         Output.Add(comboValue % 8);
     }
 
-    private void BDV(int comboValue)
+    private void BDV(long comboValue)
     {
         RegisterB = RegisterA / (int)Math.Pow(2, comboValue);
     }
-    private void CDV(int comboValue)
+    private void CDV(long comboValue)
     {
-        RegisterC = RegisterA / (int)Math.Pow(2, comboValue);
+        RegisterC = RegisterA / (long)Math.Pow(2, comboValue);
     }
 }
